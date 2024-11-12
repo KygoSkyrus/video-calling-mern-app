@@ -34,6 +34,10 @@ io.on('connection', (socket) => {
     io.to(data.to).emit('callAccepted', data.signal);
   });
 
+  socket.on('endCall', ({ to }) => {
+    io.to(to).emit('callEnded');
+  });
+
   // Handle disconnection
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);

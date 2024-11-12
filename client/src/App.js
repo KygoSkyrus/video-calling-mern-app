@@ -30,6 +30,8 @@ function App() {
     socket.on('incomingCall', ({ from, signalData }) => {
       setIncominCallInfo({ isSomeoneCalling: true, from, signalData });
     });
+
+    socket.on('callEnded', () => destroyConnection());
   }, []);
 
   const initiateCall = () => {
@@ -80,9 +82,15 @@ function App() {
   }
 
   const endCall = () => {
+    socket.emit('endCall', { to: incominCallInfo.from });
+    destroyConnection();
+  }
+
+  const destroyConnection = ()=>{
     connectionRef.current.destroy();
     window.location.reload();
   }
+  
 
   return (
     <div className="flex flex-col item-center">
@@ -99,7 +107,7 @@ function App() {
         <button onClick={initiateCall} className='input bg-blue'>Call user</button>
       </div>
 
-      <section className='m-4'>My ID: <b><u><i>ewrh8328rn8oe23d21j{socket?.id}</i></u></b></section>
+      <section className='m-4'>My ID: <u><i>{socket?.id}</i></u></section>
 
       <div className='flex flex-row gap-4 m-4 mb-8'>
         <div>
@@ -118,9 +126,9 @@ function App() {
       {callAccepted ?
         <button className='input bg-red' onClick={endCall}>End Call</button>
         :
-        (incominCallInfo.isSomeoneCalling) &&
-        <div className='mb-8'>
-          <section>{setIncominCallInfo.from} is calling</section>
+        (incominCallInfo?.isSomeoneCalling) &&
+        <div className='flex flex-col mb-8'>
+          <section className='m-4'><u>{incominCallInfo?.from}</u> is calling</section>
           <button onClick={answerCall} className='input bg-green'>Answer call</button>
         </div>
       }

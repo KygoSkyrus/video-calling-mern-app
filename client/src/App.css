@@ -1,65 +1,63 @@
-body{
+body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-.video_player{
+.video_player {
   width: 300px;
   height: 200px;
   border-radius: 12px;
   border: 1px solid #d3d3d3;
 }
 
-.input{
+.input {
   padding: 8px;
   border-radius: 7px;
   border: 1px solid gray;
 }
 
-.flex{
+.flex {
   display: flex;
 }
-.flex-row{
+.flex-row {
   flex-direction: row;
 }
-.flex-col{
+.flex-col {
   flex-direction: column;
 }
-.item-center{
+.item-center {
   align-items: center;
 }
-.gap-4{
+.gap-4 {
   gap: 4px;
 }
-
 
 .text-center {
   text-align: center;
 }
-
-.p-4{
+.p-4 {
   padding: 4px;
 }
-.m-4{
+.m-4 {
   margin: 4px;
 }
-.mb-8{
+.mb-8 {
   margin-bottom: 8px;
 }
-.w-300{
+.w-300 {
   width: 300px;
 }
 
-.bg-green{
+.bg-green {
   background-color: rgb(21, 177, 21);
   color: #fff;
 }
-.bg-blue{
+.bg-blue {
   background-color: rgb(62, 98, 214);
   color: #fff;
 }
-.bg-red{
+.bg-red {
   background-color: rgb(221, 44, 44);
   color: #fff;
 }
