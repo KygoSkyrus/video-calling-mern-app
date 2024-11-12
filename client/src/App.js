@@ -85,40 +85,45 @@ function App() {
   }
 
   return (
-    <div className="">
-      <h2>Video Call</h2>
+    <div className="flex flex-col item-center">
+      <h2 className='text-center'>Video Calling MERN App</h2>
 
-      <input
-        type="text"
-        value={userId}
-        onChange={(e) => setUserId(e.target.value)}
-        placeholder="Enter User ID"
-      />
-      <button onClick={initiateCall}>Initiate call</button>
+      <div className='flex flex-col w-300 gap-4'>
+        <input
+          type="text"
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+          placeholder="Enter User ID"
+          className='input'
+        />
+        <button onClick={initiateCall} className='input bg-blue'>Call user</button>
+      </div>
 
-      <section>id: {socket?.id}</section>
+      <section className='m-4'>My ID: <b><u><i>ewrh8328rn8oe23d21j{socket?.id}</i></u></b></section>
 
-
-      <div className='flex flex-row m-4'>
+      <div className='flex flex-row gap-4 m-4 mb-8'>
         <div>
-          <h3>My Video</h3>
+          <h3 className='text-center'>My Video</h3>
           <video ref={myVideo} autoPlay playsInline muted className='video_player' />
         </div>
-
-        {(incominCallInfo.isSomeoneCalling && !callAccepted) &&
-          <div>
-            <button onClick={answerCall}>Answer call</button>
-            <button>Decline call</button>
-          </div>
-        }
-
+        
         {callAccepted &&
           <div>
-            <h3>Peer Video</h3>
+            <h3 className='text-center'>Peer Video</h3>
             <video ref={peerVideo} autoPlay playsInline className='video_player' />
           </div>
         }
       </div>
+
+      {callAccepted ?
+        <button className='input bg-red' onClick={endCall}>End Call</button>
+        :
+        (incominCallInfo.isSomeoneCalling) &&
+        <div className='mb-8'>
+          <section>{setIncominCallInfo.from} is calling</section>
+          <button onClick={answerCall} className='input bg-green'>Answer call</button>
+        </div>
+      }
     </div>
   );
 }
