@@ -17,16 +17,7 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
   console.log('my socket id:', socket.id)
 
-  // Join room
-  // socket.on('join-room', (roomId) => {
-  //     console.log('join-room:',roomId)
-  //   socket.join(roomId);
-  //   socket.to(roomId).emit('user-joined', socket.id);
-  // });
-
-  // Signal data exchange
   socket.on('initiateCall', ({ userId, signalData, myId }) => {
-    console.log('signal: ')
     io.to(userId).emit('incomingCall', { signalData, from: myId });
   });
 

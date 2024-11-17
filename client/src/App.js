@@ -7,32 +7,36 @@ const socket = io('http://localhost:4000'); // server URL
 
 function App() {
 
-  const myVideo = useRef();
-  const peerVideo = useRef();
+  const myVideoRef = useRef();
+  const peerVideoRef = useRef();
   const connectionRef = useRef();
 
   const [stream, setStream] = useState(null);
   const [userId, setUserId] = useState('');
-  const [callAccepted, setCallAccepted] = useState(false);
+  const [isCallAccepted, setIsCallAccepted] = useState(false);
   const [incominCallInfo, setIncominCallInfo] = useState({})
 
 
   useEffect(() => {
-    // Get media stream
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
       .then((mediaStream) => {
         setStream(mediaStream);
-        myVideo.current.srcObject = mediaStream;
+        myVideoRef.current.srcObject = mediaStream;
       }).catch((error) => console.error('Error accessing media devices:', error));
 
-    console.log('id', socket.id)
-
-    socket.on('incomingCall', ({ from, signalData }) => {
-      setIncominCallInfo({ isSomeoneCalling: true, from, signalData });
-    });
-
+    socket.on('incomingCall', handleIncomingCall);
     socket.on('callEnded', () => destroyConnection());
+
+    return () => {
+      socket.off("incomingCall", handleIncomingCall);
+      socket.off("callEnded", destroyConnection)
+      socket.disconnect();
+    };
   }, []);
+
+  const handleIncomingCall = ({ from, signalData }) => {
+    setIncominCallInfo({ isSomeoneCalling: true, from, signalData });
+  }
 
   const initiateCall = () => {
     if (userId) {
@@ -43,17 +47,15 @@ function App() {
       });
 
       peer.on('signal', (signalData) => {
-        console.log('signal on peer', userId, signalData, socket.id)
         socket.emit('initiateCall', { userId, signalData, myId: socket.id }); //initiating call
       });
 
       peer.on('stream', (remoteStream) => {
-        console.log('stream on peer', remoteStream)
-        peerVideo.current.srcObject = remoteStream;
+        peerVideoRef.current.srcObject = remoteStream;
       });
 
       socket.on('callAccepted', (signal) => {
-        setCallAccepted(true);
+        setIsCallAccepted(true);
         peer.signal(signal);
       });
 
@@ -64,7 +66,7 @@ function App() {
   };
 
   const answerCall = () => {
-    setCallAccepted(true);
+    setIsCallAccepted(true);
 
     const peer = new SimplePeer({ initiator: false, trickle: false, stream: stream });
 
@@ -73,7 +75,7 @@ function App() {
     });
 
     peer.on('stream', (currentStream) => {
-      peerVideo.current.srcObject = currentStream;
+      peerVideoRef.current.srcObject = currentStream;
     });
 
     peer.signal(incominCallInfo.signalData);
@@ -112,18 +114,18 @@ function App() {
       <div className='flex flex-row gap-4 m-4 mb-8'>
         <div>
           <h3 className='text-center'>My Video</h3>
-          <video ref={myVideo} autoPlay playsInline muted className='video_player' />
+          <video ref={myVideoRef} autoPlay playsInline muted className='video_player' />
         </div>
         
-        {callAccepted &&
+        {isCallAccepted &&
           <div>
             <h3 className='text-center'>Peer Video</h3>
-            <video ref={peerVideo} autoPlay playsInline className='video_player' />
+            <video ref={peerVideoRef} autoPlay playsInline className='video_player' />
           </div>
         }
       </div>
 
-      {callAccepted ?
+      {isCallAccepted ?
         <button className='input bg-red' onClick={endCall}>End Call</button>
         :
         (incominCallInfo?.isSomeoneCalling) &&
