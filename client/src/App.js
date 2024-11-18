@@ -25,12 +25,11 @@ function App() {
       }).catch((error) => console.error('Error accessing media devices:', error));
 
     socket.on('incomingCall', handleIncomingCall);
-    socket.on('callEnded', () => destroyConnection());
+    socket.on('callEnded', destroyConnection);
 
     return () => {
       socket.off("incomingCall", handleIncomingCall);
       socket.off("callEnded", destroyConnection)
-      socket.disconnect();
     };
   }, []);
 
@@ -47,7 +46,7 @@ function App() {
       });
 
       peer.on('signal', (signalData) => {
-        socket.emit('initiateCall', { userId, signalData, myId: socket.id }); //initiating call
+        socket.emit('initiateCall', { userId, signalData, myId: socket?.id }); //initiating call
       });
 
       peer.on('stream', (remoteStream) => {
@@ -88,7 +87,7 @@ function App() {
     destroyConnection();
   }
 
-  const destroyConnection = ()=>{
+  const destroyConnection = () => {
     connectionRef.current.destroy();
     window.location.reload();
   }
